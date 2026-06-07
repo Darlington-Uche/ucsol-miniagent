@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚽ Agent Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .ball-emoji {
+            font-size: 3em;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .status-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        .status-running { background: #4ade80; box-shadow: 0 0 10px #4ade80; }
+        .status-stopped { background: #f87171; box-shadow: 0 0 10px #f87171; }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .settings-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .log-section {
+            background: #1a1a1a;
+            color: #4ade80;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="ball-emoji">⚽</div>
+            <h1>⚽ 🤖 🏆</h1>
+            <p style="color: #666;">AI Club League Agent</p>
+        </div>
+        
+        <div class="status-card">
+            <h2><span class="status-indicator status-running" id="statusDot"></span> 
+            <span id="statusText">Agent Running</span></h2>
+            <p style="margin-top: 5px; font-size: 0.9em;">PID: <span id="pid">1234</span></p>
+        </div>
+        
+        <form id="configForm">
+            <div class="form-group">
+                <label>🔑 API Key</label>
+                <input type="password" id="apiKey" placeholder="Enter your API key..." required>
+            </div>
+            
+            <div class="form-group">
+                <label>🤖 Agent Name</label>
+                <input type="text" id="agentName" placeholder="MyAwesomeAgent" required>
+            </div>
+            
+            <div class="settings-section">
+                <h3>⚙️ Strategy Settings</h3>
+                
+                <div class="form-group">
+                    <label>🎯 Strategy</label>
+                    <select id="strategy">
+                        <option value="balanced">⚖️ Balanced</option>
+                        <option value="tiki-taka">🔄 Tiki-Taka</option>
+                        <option value="counter-attack">⚡ Counter Attack</option>
+                        <option value="high-press">🔥 High Press</option>
+                        <option value="park-the-bus">🚌 Park the Bus</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>💪 Pressing Intensity</label>
+                    <div class="toggle-group" id="pressing">
+                        <div class="toggle-btn" data-value="0.3">🟢 Low</div>
+                        <div class="toggle-btn active" data-value="0.6">🟡 Medium</div>
+                        <div class="toggle-btn" data-value="0.9">🔴 High</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>⚡ Tempo</label>
+                    <div class="toggle-group" id="tempo">
+                        <div class="toggle-btn" data-value="0.3">🐌 Slow</div>
+                        <div class="toggle-btn active" data-value="0.6">🏃 Normal</div>
+                        <div class="toggle-btn" data-value="0.9">🚀 Fast</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>📏 Width</label>
+                    <div class="toggle-group" id="width">
+                        <div class="toggle-btn" data-value="0.3">📐 Narrow</div>
+                        <div class="toggle-btn active" data-value="0.5">↔️ Balanced</div>
+                        <div class="toggle-btn" data-value="0.8">🌐 Wide</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit">💾 Save & Restart Agent</button>
+        </form>
+        
+        <div class="log-section" id="logOutput">
+            ⚽ Waiting for agent to start...
+        </div>
+    </div>
+    
+    <script>
+        // Toggle button functionality
+        document.querySelectorAll('.toggle-group').forEach(group => {
+            group.addEventListener('click', (e) => {
+                if (e.target.classList.contains('toggle-btn')) {
+                    group.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                }
+            });
+        });
+        
+        // Form submission
+        document.getElementById('configForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const config = {
+                apiKey: document.getElementById('apiKey').value,
+                agentName: document.getElementById('agentName').value,
+                strategy: document.getElementById('strategy').value,
+                pressing: document.querySelector('#pressing .active').dataset.value,
+                tempo: document.querySelector('#tempo .active').dataset.value,
+                width: document.querySelector('#width .active').dataset.value
+            };
+            
+            try {
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+                
+                const result = await response.json();
+                alert('⚽ ' + result.message);
+                updateStatus();
+            } catch (error) {
+                alert('❌ Failed to save configuration');
+            }
+        });
+        
+        // Update status
+        async function updateStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const status = await response.json();
+                
+                const dot = document.getElementById('statusDot');
+                const text = document.getElementById('statusText');
+                const pid = document.getElementById('pid');
+                
+                if (status.running) {
+                    dot.className = 'status-indicator status-running';
+                    text.textContent = 'Agent Running';
+                    pid.textContent = status.pid || 'N/A';
+                } else {
+                    dot.className = 'status-indicator status-stopped';
+                    text.textContent = 'Agent Stopped';
+                    pid.textContent = 'N/A';
+                }
+                
+                if (status.brain) {
+                    document.getElementById('logOutput').textContent = status.brain;
+                }
+            } catch (error) {
+                console.error('Status update failed:', error);
+            }
+        }
+        
+        // Update status every 5 seconds
+        setInterval(updateStatus, 5000);
+        updateStatus();
+    </script>
+</body>
+</html>
