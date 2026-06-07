@@ -1,0 +1,15 @@
+{
+  "name": "ai-agent-club",
+  "version": "1.0.0",
+  "description": "AI Club League Agent with Web Dashboard",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "agent": "node agent.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0",
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2"
+  }
+}
